@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ADLSGen2Storage'"
 		},
+		"SQLDatabase_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'SQLDatabase'"
+		},
 		"ADLSGen2Storage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stcountriesdata.dfs.core.windows.net/"
@@ -18,6 +22,18 @@
 		"RestCountriesAPI_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://restcountries.com/v3.1/name/"
+		},
+		"SQLDatabase_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sqlserver-internship-countries.database.windows.net"
+		},
+		"SQLDatabase_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "CustomerProductDB"
+		},
+		"SQLDatabase_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "sqladmin2"
 		},
 		"containerUri": {
 			"type": "string",
@@ -49,11 +65,23 @@
 					"ADLSGen2Storage_accountKey": {
 						"value": "[parameters('ADLSGen2Storage_accountKey')]"
 					},
+					"SQLDatabase_password": {
+						"value": "[parameters('SQLDatabase_password')]"
+					},
 					"ADLSGen2Storage_properties_typeProperties_url": {
 						"value": "[parameters('ADLSGen2Storage_properties_typeProperties_url')]"
 					},
 					"RestCountriesAPI_properties_typeProperties_url": {
 						"value": "[parameters('RestCountriesAPI_properties_typeProperties_url')]"
+					},
+					"SQLDatabase_properties_typeProperties_server": {
+						"value": "[parameters('SQLDatabase_properties_typeProperties_server')]"
+					},
+					"SQLDatabase_properties_typeProperties_database": {
+						"value": "[parameters('SQLDatabase_properties_typeProperties_database')]"
+					},
+					"SQLDatabase_properties_typeProperties_userName": {
+						"value": "[parameters('SQLDatabase_properties_typeProperties_userName')]"
 					}
 				}
 			},

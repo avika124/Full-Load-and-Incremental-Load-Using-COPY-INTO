@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ADLSGen2Storage'"
 		},
+		"SQLDatabase_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'SQLDatabase'"
+		},
 		"ADLSGen2Storage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stcountriesdata.dfs.core.windows.net/"
@@ -18,6 +22,18 @@
 		"RestCountriesAPI_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://restcountries.com/v3.1/name/"
+		},
+		"SQLDatabase_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sqlserver-internship-countries.database.windows.net"
+		},
+		"SQLDatabase_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "CustomerProductDB"
+		},
+		"SQLDatabase_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "sqladmin2"
 		}
 	},
 	"variables": {
@@ -57,6 +73,28 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SQLDatabase')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('SQLDatabase_properties_typeProperties_server')]",
+					"database": "[parameters('SQLDatabase_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('SQLDatabase_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('SQLDatabase_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CountryJSONOutput')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -90,6 +128,48 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/CustomerDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Customer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProductDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Product"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDatabase')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/RestCountriesDataset')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -119,7 +199,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Countries_Data_Pipeline')]",
+			"name": "[concat(parameters('factoryName'), '/Task 1-Countries_Data_Pipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -220,6 +300,241 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Task 4 - Product_Data_Child_Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Check_Customer_Count_For_Product",
+						"type": "IfCondition",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greater(pipeline().parameters.customerCount, 600)",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Copy_Product_Data",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "ProductDataset",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "CountryJSONOutput",
+											"type": "DatasetReference",
+											"parameters": {
+												"fileName": "product_data.json"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"customerCount": {
+						"type": "int",
+						"defaultValue": 600
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ProductDataset')]",
+				"[concat(variables('factoryId'), '/datasets/CountryJSONOutput')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Task 2 and 3-Customer_Data_Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Check_Customer_Count",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Get_Customer_Count",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greater(activity('Get_Customer_Count').output.firstRow.record_count, pipeline().parameters.customerCountThreshold)",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Copy_Customer_Data",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "CustomerDataset",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "CountryJSONOutput",
+											"type": "DatasetReference",
+											"parameters": {
+												"fileName": "customer_data.json"
+											}
+										}
+									]
+								},
+								{
+									"name": "Call_Product_Pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Copy_Customer_Data",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Task 4 - Product_Data_Child_Pipeline",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"customerCount": {
+												"value": "@variables('customerRecordCount')",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get_Customer_Count",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT COUNT(*) as record_count FROM dbo.Customer",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "CustomerDataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"customerCountThreshold": {
+						"type": "int",
+						"defaultValue": 500
+					}
+				},
+				"variables": {
+					"customerRecordCount": {
+						"type": "Integer",
+						"defaultValue": 650
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CustomerDataset')]",
+				"[concat(variables('factoryId'), '/datasets/CountryJSONOutput')]",
+				"[concat(variables('factoryId'), '/pipelines/Task 4 - Product_Data_Child_Pipeline')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Countries_Midnight_Trigger')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -229,7 +544,7 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "Countries_Data_Pipeline",
+							"referenceName": "Task 1-Countries_Data_Pipeline",
 							"type": "PipelineReference"
 						},
 						"parameters": {}
@@ -254,7 +569,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Countries_Data_Pipeline')]"
+				"[concat(variables('factoryId'), '/pipelines/Task 1-Countries_Data_Pipeline')]"
 			]
 		},
 		{
@@ -267,7 +582,7 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "Countries_Data_Pipeline",
+							"referenceName": "Task 1-Countries_Data_Pipeline",
 							"type": "PipelineReference"
 						},
 						"parameters": {}
@@ -292,7 +607,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Countries_Data_Pipeline')]"
+				"[concat(variables('factoryId'), '/pipelines/Task 1-Countries_Data_Pipeline')]"
 			]
 		}
 	]

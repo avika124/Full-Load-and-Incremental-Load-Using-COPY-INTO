@@ -8,11 +8,23 @@
 		"ADLSGen2Storage_accountKey": {
 			"value": ""
 		},
+		"SQLDatabase_password": {
+			"value": ""
+		},
 		"ADLSGen2Storage_properties_typeProperties_url": {
 			"value": "https://stcountriesdata.dfs.core.windows.net/"
 		},
 		"RestCountriesAPI_properties_typeProperties_url": {
 			"value": "https://restcountries.com/v3.1/name/"
+		},
+		"SQLDatabase_properties_typeProperties_server": {
+			"value": "sqlserver-internship-countries.database.windows.net"
+		},
+		"SQLDatabase_properties_typeProperties_database": {
+			"value": "CustomerProductDB"
+		},
+		"SQLDatabase_properties_typeProperties_userName": {
+			"value": "sqladmin2"
 		},
 		"containerUri": {
 			"value": ""
