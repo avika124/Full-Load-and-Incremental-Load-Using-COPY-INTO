@@ -199,7 +199,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Task 1-Countries_Data_Pipeline')]",
+			"name": "[concat(parameters('factoryName'), '/Task 1 and 2-Countries_Data_Pipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -383,7 +383,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Task 2 and 3-Customer_Data_Pipeline')]",
+			"name": "[concat(parameters('factoryName'), '/Task 3-Customer_Data_Pipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -544,7 +544,7 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "Task 1-Countries_Data_Pipeline",
+							"referenceName": "Task 1 and 2-Countries_Data_Pipeline",
 							"type": "PipelineReference"
 						},
 						"parameters": {}
@@ -569,7 +569,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Task 1-Countries_Data_Pipeline')]"
+				"[concat(variables('factoryId'), '/pipelines/Task 1 and 2-Countries_Data_Pipeline')]"
 			]
 		},
 		{
@@ -582,7 +582,7 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "Task 1-Countries_Data_Pipeline",
+							"referenceName": "Task 1 and 2-Countries_Data_Pipeline",
 							"type": "PipelineReference"
 						},
 						"parameters": {}
@@ -607,7 +607,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Task 1-Countries_Data_Pipeline')]"
+				"[concat(variables('factoryId'), '/pipelines/Task 1 and 2-Countries_Data_Pipeline')]"
 			]
 		}
 	]
