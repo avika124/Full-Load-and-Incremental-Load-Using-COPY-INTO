@@ -1,5 +1,5 @@
 {
-	"name": "Task 2 and 3-Customer_Data_Pipeline",
+	"name": "Task 3-Customer_Data_Pipeline",
 	"properties": {
 		"activities": [
 			{
@@ -87,7 +87,10 @@
 								},
 								"waitOnCompletion": true,
 								"parameters": {
-									"customerCount": "@variables('customerRecordCount')"
+									"customerCount": {
+										"value": "@variables('customerRecordCount')",
+										"type": "Expression"
+									}
 								}
 							}
 						}
