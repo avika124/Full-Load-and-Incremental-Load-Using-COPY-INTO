@@ -202,8 +202,7 @@
 				},
 				"variables": {
 					"countries": {
-						"type": "String",
-						"defaultValue": "[[\"india\",\"us\",\"uk\",\"china\",\"russia\"]"
+						"type": "Array"
 					}
 				},
 				"annotations": []
