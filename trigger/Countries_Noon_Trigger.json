@@ -6,7 +6,7 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "Countries_Data_Pipeline",
+					"referenceName": "Task 1-Countries_Data_Pipeline",
 					"type": "PipelineReference"
 				}
 			}
