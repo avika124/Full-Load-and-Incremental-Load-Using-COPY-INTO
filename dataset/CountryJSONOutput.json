@@ -1,0 +1,25 @@
+{
+	"name": "CountryJSONOutput",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADLSGen2Storage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"fileName": {
+				"type": "string",
+				"defaultValue": "us.json"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "@concat(dataset().fileName)",
+				"fileSystem": "countries"
+			}
+		},
+		"schema": {}
+	}
+}
