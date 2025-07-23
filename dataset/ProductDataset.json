@@ -1,0 +1,16 @@
+{
+	"name": "ProductDataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Product"
+		}
+	}
+}

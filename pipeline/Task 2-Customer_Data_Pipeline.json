@@ -1,0 +1,126 @@
+{
+	"name": "Task 2-Customer_Data_Pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Set_Customer_Count",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Check_Customer_Count",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "customerRecordCount",
+					"value": 650
+				}
+			},
+			{
+				"name": "Check_Customer_Count",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(variables('customerRecordCount'), parameters('customerCountThreshold'))",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Copy_Customer_Data",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "CustomerDataset",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "CountryJSONOutput",
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": "us.json"
+									}
+								}
+							]
+						},
+						{
+							"name": "Call_Product_Pipeline",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "Copy_Customer_Data",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Product_Data_Child_Pipeline",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"customerCount": "@variables('customerRecordCount')"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"customerCountThreshold": {
+				"type": "int",
+				"defaultValue": 500
+			}
+		},
+		"variables": {
+			"customerRecordCount": {
+				"type": "Integer",
+				"defaultValue": 650
+			}
+		},
+		"annotations": []
+	}
+}
