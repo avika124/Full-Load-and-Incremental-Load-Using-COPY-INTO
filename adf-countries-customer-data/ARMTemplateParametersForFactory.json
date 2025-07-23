@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-countries-customer-data"
+		},
+		"ADLSGen2Storage_accountKey": {
+			"value": ""
+		},
+		"ADLSGen2Storage_properties_typeProperties_url": {
+			"value": "https://stcountriesdata.dfs.core.windows.net/"
+		},
+		"RestCountriesAPI_properties_typeProperties_url": {
+			"value": "https://restcountries.com/v3.1/name/"
+		}
+	}
+}
