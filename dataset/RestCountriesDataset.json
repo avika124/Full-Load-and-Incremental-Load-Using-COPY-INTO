@@ -1,0 +1,21 @@
+{
+	"name": "RestCountriesDataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestCountriesAPI",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"countryName": {
+				"type": "string",
+				"defaultValue": "us"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "@dataset().countryName"
+		},
+		"schema": []
+	}
+}
