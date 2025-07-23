@@ -1,5 +1,5 @@
 {
-	"name": "Task 2-Customer_Data_Pipeline",
+	"name": "Task 2 and 3-Customer_Data_Pipeline",
 	"properties": {
 		"activities": [
 			{
@@ -82,7 +82,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "Product_Data_Child_Pipeline",
+									"referenceName": "Task 4 - Product_Data_Child_Pipeline",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
