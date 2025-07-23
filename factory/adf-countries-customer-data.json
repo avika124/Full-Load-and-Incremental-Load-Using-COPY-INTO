@@ -1,0 +1,9 @@
+{
+	"name": "adf-countries-customer-data",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "9975e0fc-4363-4dc3-8624-af276eeda270",
+		"tenantId": "6dbd461d-161f-448e-ab01-61a6cbf78126"
+	}
+}
