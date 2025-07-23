@@ -202,7 +202,14 @@
 				},
 				"variables": {
 					"countries": {
-						"type": "Array"
+						"type": "Array",
+						"defaultValue": [
+							"india",
+							"us",
+							"uk",
+							"china",
+							"russia"
+						]
 					}
 				},
 				"annotations": []
