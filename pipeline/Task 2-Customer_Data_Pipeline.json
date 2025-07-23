@@ -3,34 +3,20 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Set_Customer_Count",
-				"type": "SetVariable",
+				"name": "Check_Customer_Count",
+				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "Check_Customer_Count",
+						"activity": "Get_Customer_Count",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "customerRecordCount",
-					"value": 650
-				}
-			},
-			{
-				"name": "Check_Customer_Count",
-				"type": "IfCondition",
-				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@greater(variables('customerRecordCount'), parameters('customerCountThreshold'))",
+						"value": "@greater(activity('Get_Customer_Count').output.firstRow.record_count, pipeline().parameters.customerCountThreshold)",
 						"type": "Expression"
 					},
 					"ifTrueActivities": [
@@ -74,7 +60,7 @@
 									"referenceName": "CountryJSONOutput",
 									"type": "DatasetReference",
 									"parameters": {
-										"fileName": "us.json"
+										"fileName": "customer_data.json"
 									}
 								}
 							]
@@ -106,6 +92,31 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Get_Customer_Count",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT COUNT(*) as record_count FROM dbo.Customer",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "CustomerDataset",
+						"type": "DatasetReference"
+					}
 				}
 			}
 		],
